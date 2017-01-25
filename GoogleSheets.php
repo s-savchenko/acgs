@@ -108,4 +108,18 @@ class GoogleSheets
             return false;
         }
     }
+
+    public function append($listId, $range, $values)
+    {
+        $body = new Google_Service_Sheets_ValueRange([
+            'values' => [$values]
+        ]);
+        $params = ['valueInputOption' => 'RAW'];
+        try {
+            $this->getService()->spreadsheets_values->append($listId, $range, $body, $params);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }
