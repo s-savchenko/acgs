@@ -26,7 +26,7 @@ class GoogleSheets
      * Returns an authorized API client.
      * @return mixed
      */
-    function getClient() {
+    public function getClient() {
         $accessToken = $this->getAccessToken();
 
         if ($accessToken === false) {
@@ -40,6 +40,11 @@ class GoogleSheets
             }
             return $client;
         }
+    }
+
+    public function isReady()
+    {
+        return $this->getClient() !== false;
     }
 
     public function getAccessToken()
@@ -80,5 +85,4 @@ class GoogleSheets
         }
         return $this->googleClient;
     }
-
 }
