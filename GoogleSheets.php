@@ -95,7 +95,7 @@ class GoogleSheets
         return $this->googleClient;
     }
 
-    public function writeSingleRange($listId, $range, $values)
+    public function writeRow($listId, $range, $values)
     {
         $body = new Google_Service_Sheets_ValueRange([
             'values' => [$values]
@@ -121,5 +121,11 @@ class GoogleSheets
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    public function getRows($listId, $range)
+    {
+        $response = $this->getService()->spreadsheets_values->get($listId, $range);
+        return $response->getValues();
     }
 }

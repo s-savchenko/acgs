@@ -8,27 +8,29 @@
  */
 class ActiveCampaign
 {
+    const REQUEST_TYPE_SUBSCRIBE = 'subscribe';
+    const REQUEST_TYPE_UNSUBSCRIBE = 'unsubscribe';
+    const REQUEST_TYPE_UPDATE = 'update';
+
     protected $apiKey = false;
     protected $apiUrl = false;
     protected $apiOutput = 'json';
 
-    public function __construct()
+    public function __construct($apiKey, $apiUrl)
     {
-        $conf = require_once('conf.php');
-        $this->apiKey = $conf['apiKey'];
-        $this->apiUrl = $conf['apiUrl'];
+        $this->apiKey = $apiKey;
+        $this->apiUrl = $apiUrl;
     }
 
-    protected function request($action, $outputFormat = 'json', $full = true)
+    protected function request($action, $params, $outputFormat = 'json', $full = true)
     {
-        $params = [
+        $params = array_merge($params, [
             'api_key' => $this->apiKey,
             'api_action' => $action,
             'api_output' => $outputFormat,
-            'ids' => 'all',
             'full' => $full ? 1 : 0,
             'page' => 1
-        ];
+        ]);
 
         $query = '';
         foreach($params as $key => $val)
@@ -49,9 +51,11 @@ class ActiveCampaign
         return json_decode($response, true);
     }
 
-    public function getContactList()
+    public function getContactList($contactIds)
     {
-        $result = $this->request('contact_list');
+        $result = $this->request('contact_list', [
+            'ids' => implode(',', $contactIds)
+        ]);
 
         $contacts = [];
         if (is_array($result) && array_key_exists('result_code', $result) && $result['result_code'] == 1) {
@@ -72,11 +76,6 @@ class ActiveCampaign
             }
         }
 
-        return $result;
-    }
-
-    public function getContactInfo()
-    {
-
+        return $contacts;
     }
 }

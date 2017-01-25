@@ -8,6 +8,7 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'GoogleSheets.php';
+require_once 'ActiveCampaign.php';
 
 $config = require_once('config.php');
 
