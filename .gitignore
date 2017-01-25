@@ -2,3 +2,4 @@
 vendor
 client_secret.json
 google_credentials.json
+config.php

@@ -20,3 +20,5 @@ Step 2: Install the Google Client Library
 
 Run the following command to install the library using composer:
 php composer.phar require google/apiclient:^2.0
+
+Step 3: Config
