@@ -13,6 +13,7 @@ class GoogleSheets
     protected $clientSecretPath;
     protected $scopes;
     protected $googleClient;
+    protected $service;
 
     public function __construct($appName, $credentialsPath, $clientSecretPath)
     {
@@ -26,7 +27,8 @@ class GoogleSheets
      * Returns an authorized API client.
      * @return mixed
      */
-    public function getClient() {
+    protected function getClient()
+    {
         $accessToken = $this->getAccessToken();
 
         if ($accessToken === false) {
@@ -42,12 +44,19 @@ class GoogleSheets
         }
     }
 
+    protected function getService()
+    {
+        if ($this->service == null)
+            $this->service = new Google_Service_Sheets($this->getClient());
+        return $this->service;
+    }
+
     public function isReady()
     {
         return $this->getClient() !== false;
     }
 
-    public function getAccessToken()
+    protected function getAccessToken()
     {
         if (file_exists($this->credentialsPath)) {
             return json_decode(file_get_contents($this->credentialsPath), true);
@@ -84,5 +93,19 @@ class GoogleSheets
             $this->googleClient = $client;
         }
         return $this->googleClient;
+    }
+
+    public function writeSingleRange($listId, $range, $values)
+    {
+        $body = new Google_Service_Sheets_ValueRange([
+            'values' => [$values]
+        ]);
+        $params = ['valueInputOption' => 'RAW'];
+        try {
+            $this->getService()->spreadsheets_values->update($listId, $range, $body, $params);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
