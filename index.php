@@ -18,10 +18,9 @@ if (!$g->isReady()) {
 
 $ac = new ActiveCampaign($config['acApiKey'], $config['acApiUrl']);
 
-$type = 'unsubscribe';
-//$type = 'subscribe';
-$contactId = 2;
-
+$type = $_POST['type'];
+$contactId = (int)$_POST['contact']['id'];
+file_put_contents('type'.microtime(), $type);
 try {
     $contact = $ac->getContactList([$contactId])[0];
     $contact = [
@@ -36,26 +35,25 @@ try {
         $contact['status'] == 1 ? 'subscribed' : 'unsubscribed',
     ];
 
-    if ($type == ActiveCampaign::REQUEST_TYPE_SUBSCRIBE) {
-        $g->append($config['googleListId'], $config['googleSheetRange'], $contact);
-    } elseif ($type == ActiveCampaign::REQUEST_TYPE_UNSUBSCRIBE) {
-        $contacts = $g->getRows($config['googleListId'], $config['googleSheetRange']);
+    if (in_array($type, [ActiveCampaign::REQUEST_TYPE_SUBSCRIBE, ActiveCampaign::REQUEST_TYPE_UPDATE])) {
+        $contacts = $g->getRows($config['googleListId'], 'Sheet1');
+        $updated = false;
         for ($i = 0; $i < count($contacts); $i++) {
             if (is_array($contacts[$i]) && $contacts[$i][0] == $contactId) {
                 $i++;
-                $x = $g->writeRow(
+                $g->writeRow(
                     $config['googleListId'],
-                    $config['googleSheetRange'] . '!A' . $i,
+                    explode('!', $config['googleSheetRange'])[0] . '!A' . $i,
                     $contact);
-                break;
+                $updated = true;
             }
         }
-    } elseif ($type == ActiveCampaign::REQUEST_TYPE_UPDATE) {
 
+        if ($updated == false) {
+            $g->append($config['googleListId'], $config['googleSheetRange'], $contact);
+        }
     }
 
 } catch (Exception $e) {
     var_dump($e);
 }
-sleep(5);
-//$g->append($config['googleListId'], $config['googleSheetRange'], [1,2,3]);
