@@ -22,3 +22,5 @@ Run the following command to install the library using composer:
 php composer.phar require google/apiclient:^2.0
 
 Step 3: Config
+
+P.S. It's not final version, just let me complete it.
