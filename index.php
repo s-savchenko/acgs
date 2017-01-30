@@ -20,7 +20,7 @@ $ac = new ActiveCampaign($config['acApiKey'], $config['acApiUrl']);
 
 $type = $_POST['type'];
 $contactId = (int)$_POST['contact']['id'];
-file_put_contents('type'.microtime(), $type);
+
 try {
     $contact = $ac->getContactList([$contactId])[0];
     $contact = [
